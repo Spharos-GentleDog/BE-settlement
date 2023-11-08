@@ -12,10 +12,15 @@ import org.springframework.web.bind.annotation.RestController;
 public class SettlementController {
     private final SettlementService settlementService;
 
-    // kafka 테스트를 위한 컨트롤러, 추후 삭제예정
+    /**
+     *
+     */
+
+    // kafka 테스트를 위한 컨트롤러, 추후 수정
     @GetMapping("")
     public void testConsume() {
-        settlementService.consume();
+        settlementService.consume(null);
     }
+
 
 }

@@ -1,41 +1,45 @@
 package egenius.settlement.domain.settlement.application;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import egenius.settlement.global.common.exception.BaseException;
+import egenius.settlement.global.common.response.BaseResponseStatus;
 import egenius.settlement.global.config.kafka.KafkaConsumerConfig;
 import lombok.RequiredArgsConstructor;
-import org.apache.kafka.clients.consumer.ConsumerRecord;
-import org.apache.kafka.clients.consumer.ConsumerRecords;
-import org.apache.kafka.clients.consumer.KafkaConsumer;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.HashMap;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class SettlementServiceImpl implements SettlementService{
 
     // ConsumerConfig를 주입받음
     private final KafkaConsumerConfig consumerConfig;
+    private final ObjectMapper objectMapper;
 
     @Override
-    public void consume() {
-        // config에서 정의한 createConsumer로 consumer를 생성
-        KafkaConsumer<String, String> consumer = consumerConfig.createConsumer();
-        // 정보를 가져올 topic을 subscribe
-        consumer.subscribe(Arrays.asList("payment_data"));
+    @KafkaListener(topics = "payment_data", groupId = "test1")
+    public void consume(String message) {
+        try {
+            // String Type으로 통째로 넘어온 Chunk에서, items에 payment 정보가 담겨있으므로
+            HashMap<String, Object> kafkaData = objectMapper.readValue(message, HashMap.class);
+            ArrayList paymentData = (ArrayList) kafkaData.get("items");
+            paymentData.forEach(data->{
+                System.out.println("paymentData = " + data);
+            });
 
-        int result=0;
-        while (true) {
-            // poll에서 설정한 ms동안 데이터를 기다린다 = 설정한 값동안 기다리다가 다음 코드를 실행한다
-            // 만약 그 시간동안 데이터가 오지 않는다면 -> 빈 records를 반환, 데이터가 있다면 데이터 records를 반환
-            ConsumerRecords<String, String> records = consumer.poll(10000000);
-            // records는 데이터 list이므로, record로 뽑아낸 후 record.value()로 프로듀서가 보낸 진짜 값을 가져올 수 있다
-            for (ConsumerRecord<String, String> record : records) {
-                // record.value()를 통해 데이터를 가져올 수 있다
-                result += Integer.parseInt(record.value());
-                System.out.println("record.value() = " + record.value()+", result = "+result);
-            }
-            System.out.println("final result = " + result);
-            break;
+
+
+        } catch (JsonProcessingException e) {
+            log.info("error: "+e.getMessage());
+            throw new BaseException(BaseResponseStatus.JSON_PARSING_ERROR);
         }
+
     }
+
 }

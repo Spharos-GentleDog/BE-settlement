@@ -22,7 +22,7 @@ public enum BaseResponseStatus {
     /**
      * 6000 : Settlement Service Error
      */
-
+    JSON_PARSING_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, false, 6000, "메시지를 Parsing 할 수 없습니다."),
 
      ;
 
