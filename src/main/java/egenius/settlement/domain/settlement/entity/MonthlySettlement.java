@@ -3,16 +3,13 @@ package egenius.settlement.domain.settlement.entity;
 import egenius.settlement.domain.settlement.entity.enums.SettlementStatus;
 import egenius.settlement.global.common.BaseTimeEntity;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDate;
 
 @Entity
 @Builder
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Getter
 public class MonthlySettlement extends BaseTimeEntity {
