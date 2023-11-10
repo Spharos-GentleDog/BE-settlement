@@ -12,7 +12,8 @@ import java.time.LocalDate;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Getter
-public class MonthlySettlement extends BaseTimeEntity {
+@Table(name = "monthly_settlement")
+public class MonthlySettlement {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
