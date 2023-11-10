@@ -8,6 +8,7 @@ import lombok.*;
 @Builder
 @AllArgsConstructor
 @Getter
+@Table(name = "commission")
 public class Commission {
 
     @Id

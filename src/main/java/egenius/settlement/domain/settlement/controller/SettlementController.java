@@ -16,11 +16,6 @@ public class SettlementController {
      *
      */
 
-    // kafka 테스트를 위한 컨트롤러, 추후 수정
-    @GetMapping("")
-    public void testConsume() {
-        settlementService.consume(null);
-    }
 
 
 }

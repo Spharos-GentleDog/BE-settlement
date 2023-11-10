@@ -1,5 +1,6 @@
 package egenius.settlement.domain.settlement.entity;
 
+import egenius.settlement.global.common.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -8,7 +9,8 @@ import lombok.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Getter
-public class MonthlySettlementList {
+@Table(name = "monthly_settlement_list")
+public class MonthlySettlementList extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

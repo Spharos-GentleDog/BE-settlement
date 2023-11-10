@@ -33,8 +33,6 @@ public class SettlementServiceImpl implements SettlementService{
                 System.out.println("paymentData = " + data);
             });
 
-
-
         } catch (JsonProcessingException e) {
             log.info("error: "+e.getMessage());
             throw new BaseException(BaseResponseStatus.JSON_PARSING_ERROR);
