@@ -5,6 +5,9 @@ spring:
   config:
     activate:
       on-profile: prod
+  # 카프카 접속정보 설정
+  kafka:
+    bootstrap-servers: ${BOOTSTRAP_SERVERS}
 
   jpa:
     hibernate:
