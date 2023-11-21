@@ -1,6 +1,6 @@
-package egenius.settlement.domain.settlement.infrastructure;
+package egenius.settlement.domain.paysettlement.infrastructure;
 
-import egenius.settlement.domain.settlement.entity.MonthlySettlement;
+import egenius.settlement.domain.paysettlement.entity.MonthlySettlement;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

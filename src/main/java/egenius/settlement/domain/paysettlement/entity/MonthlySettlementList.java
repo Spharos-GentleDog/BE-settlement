@@ -1,4 +1,4 @@
-package egenius.settlement.domain.settlement.entity;
+package egenius.settlement.domain.paysettlement.entity;
 
 import egenius.settlement.global.common.BaseTimeEntity;
 import jakarta.persistence.*;

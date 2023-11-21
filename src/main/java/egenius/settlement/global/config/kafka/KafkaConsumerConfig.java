@@ -1,6 +1,5 @@
 package egenius.settlement.global.config.kafka;
 
-import com.fasterxml.jackson.databind.deser.std.MapDeserializer;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -9,8 +8,7 @@ import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
 import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 import static org.apache.kafka.clients.consumer.ConsumerConfig.*;
 
@@ -22,7 +20,7 @@ public class KafkaConsumerConfig {
     private String bootstrapAddress;
 
     @Bean
-    public ConcurrentKafkaListenerContainerFactory<String, String> kafkaListenerContainerFactoryr() {
+    public ConcurrentKafkaListenerContainerFactory<String, String> kafkaListenerContainerFactory() {
         ConcurrentKafkaListenerContainerFactory<String, String> factory = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(createConsumer());
         factory.setConcurrency(5);
@@ -38,7 +36,18 @@ public class KafkaConsumerConfig {
         // 메시지를 가져올 파티션의 key를 역직렬화
         configs.put(KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         // value는 메시지라 보면 됨
-        configs.put(VALUE_DESERIALIZER_CLASS_CONFIG, MapDeserializer.class);
+        configs.put(VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         return new DefaultKafkaConsumerFactory<>(configs);
+    }
+
+    @Bean
+    public Properties dailyPaymentSaveProps() {
+        Properties props = new Properties();
+        props.put(BOOTSTRAP_SERVERS_CONFIG, bootstrapAddress);
+        props.put(GROUP_ID_CONFIG, "test1");
+        props.put(KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
+        props.put(VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
+//        props.put(MAX_POLL_RECORDS_CONFIG, 10);
+        return props;
     }
 }
