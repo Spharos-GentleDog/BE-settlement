@@ -83,16 +83,16 @@ public class PaymentSaveJob {
     // 3. reader
     @Bean
     public KafkaItemReader<String, String> kafkaItemReader() {
-        // kafka consumer
+        // kafka consumer -> kafkaItemReader는 컨슈머 하나만 설정 가능
         List<Integer> partitions = Arrays.asList(0, 1, 2, 3, 4);
         KafkaItemReader<String, String> dailyPaymentSaveItemReader = new KafkaItemReaderBuilder<String, String>()
                 .partitions(partitions)
                 .partitionOffsets(new HashMap<>()) //모름
                 .consumerProperties(dailyPaymentSaveProps)
                 .name("dailyPaymentSaveItemReader")
-                .saveState(true) // 모름
-                .pollTimeout(Duration.ofSeconds(1L))
-                .topic("payment_data")
+                .saveState(true) // 현재까지 읽은 상태를 저장. 재시작할 때 중단된 지점부터 다시 읽을 수 있음
+                .pollTimeout(Duration.ofSeconds(10L))
+                .topic("payment_topic")
                 .build();
         return dailyPaymentSaveItemReader;
     }
