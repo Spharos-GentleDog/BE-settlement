@@ -26,6 +26,7 @@ public enum BaseResponseStatus {
     DAILY_SETTLEMENT_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, false, 6001, "일일 정산에 실패했습니다"),
     DUPLICATE_DAILY_SETTLEMENT_LIST(HttpStatus.INTERNAL_SERVER_ERROR, false, 6002, "정산 내용이 중복됩니다"),
     PAYMENT_DATA_SAVE_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, false, 6003, "결제 데이터 저장에 실패했습니다"),
+    NO_DATA(HttpStatus.BAD_REQUEST, false, 6004, "존재하지 않는 정보입니다"),
     ;
 
 

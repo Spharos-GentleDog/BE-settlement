@@ -1,10 +1,33 @@
 package egenius.settlement.domain.paysettlement.application;
 
-import org.springframework.kafka.annotation.KafkaListener;
+
+import egenius.settlement.domain.paysettlement.dtos.out.GetDailySettlementOutDto;
+import egenius.settlement.domain.paysettlement.entity.DailyProductSettlement;
+import egenius.settlement.domain.paysettlement.entity.DailySettlement;
+import egenius.settlement.domain.paysettlement.entity.enums.PaymentMethod;
 
 public interface SettlementService {
 
-//    @KafkaListener(topics = "payment_data", groupId = "test1")
-//    void consume(String message);
+    /**
+     * 1. DailySettlement 생성
+     * 2. DailyProductSettlement 생성
+     * 3. DailySettlement 조회
+     */
 
+
+    // 1. DailySettlement 생성
+    DailySettlement createDailySettlement(String vendorEmail, DailyProductSettlement dailyProductSettlement);
+
+    // 2. DailyProductSettlement 생성
+    DailyProductSettlement createDailyProductSettlement(
+            String productName,
+            String productCode,
+            Integer productAmount,
+            Integer count,
+            String productMainImageUrl,
+            PaymentMethod paymentMethod
+    );
+
+    // 3. DailySettlement 조회
+    GetDailySettlementOutDto getDailySettlement(String vendorEmail);
 }

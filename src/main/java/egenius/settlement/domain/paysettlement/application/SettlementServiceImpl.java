@@ -1,30 +1,25 @@
 package egenius.settlement.domain.paysettlement.application;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import egenius.settlement.domain.paysettlement.dtos.DailyProductSettlementDto;
+import egenius.settlement.domain.paysettlement.dtos.out.GetDailySettlementOutDto;
 import egenius.settlement.domain.paysettlement.entity.*;
 import egenius.settlement.domain.paysettlement.entity.enums.PaymentMethod;
 import egenius.settlement.domain.paysettlement.entity.enums.SettlementStatus;
-import egenius.settlement.domain.paysettlement.infrastructure.BeforeSettlementRepository;
 import egenius.settlement.domain.paysettlement.infrastructure.DailyProductSettlementRepository;
-import egenius.settlement.domain.paysettlement.infrastructure.DailySettlementListRepository;
 import egenius.settlement.domain.paysettlement.infrastructure.DailySettlementRepository;
 import egenius.settlement.global.common.exception.BaseException;
 import egenius.settlement.global.common.response.BaseResponseStatus;
-import egenius.settlement.global.config.kafka.KafkaConsumerConfig;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
-import org.springframework.batch.item.Chunk;
-import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.List;
 import java.util.Optional;
 
 @Slf4j
@@ -33,13 +28,9 @@ import java.util.Optional;
 @Transactional
 public class SettlementServiceImpl implements SettlementService {
 
-    // ConsumerConfig를 주입받음
-    private final KafkaConsumerConfig consumerConfig;
-    private final ObjectMapper objectMapper;
     // repository
     private final DailyProductSettlementRepository dailyProductSettlementRepository;
     private final DailySettlementRepository dailySettlementRepository;
-    private final DailySettlementListRepository dailySettlementListRepository;
     private final JPAQueryFactory jpaQueryFactory;
     // util
     private final ModelMapper modelMapper;
@@ -48,9 +39,11 @@ public class SettlementServiceImpl implements SettlementService {
     /**
      * 1. DailySettlement 생성
      * 2. DailyProductSettlement 생성
+     * 3. DailySettlement 조회
      */
 
     // 1. DailySettlement 생성
+    @Override
     public DailySettlement createDailySettlement(String vendorEmail, DailyProductSettlement dailyProductSettlement) {
         Optional<DailySettlement> findResult = dailySettlementRepository.findByVendorEmail(vendorEmail);
         DailySettlement dailySettlement = null;
@@ -75,7 +68,9 @@ public class SettlementServiceImpl implements SettlementService {
         return dailySettlement;
     }
 
+
     // 2. DailyProductSettlement 생성
+    @Override
     public DailyProductSettlement createDailyProductSettlement(
             String productName,
             String productCode,
@@ -134,6 +129,25 @@ public class SettlementServiceImpl implements SettlementService {
     }
 
 
+    // 3. DailySettlement 조회
+    @Override
+    public GetDailySettlementOutDto getDailySettlement(String vendorEmail) {
+        // 판매자 아이디로 조회
+        DailySettlement dailySettlement = dailySettlementRepository.findByVendorEmail(vendorEmail)
+                .orElseThrow(() -> new BaseException(BaseResponseStatus.NO_DATA));
 
+        // DailyProductSettlementDto 생성
+        List<DailyProductSettlementDto> productList = new ArrayList<>();
+        dailySettlement.getDailyProductSettlementList().forEach(data -> {
+            DailyProductSettlementDto settlementDto = modelMapper.map(data, DailyProductSettlementDto.class);
+            productList.add(settlementDto);
+        });
+
+        // return Dto 생성
+        GetDailySettlementOutDto outDto = modelMapper.map(dailySettlement, GetDailySettlementOutDto.class);
+        outDto.createProductList(productList);
+
+        return outDto;
+    }
 
 }
