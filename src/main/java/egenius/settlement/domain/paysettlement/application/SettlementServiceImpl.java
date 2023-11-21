@@ -45,27 +45,27 @@ public class SettlementServiceImpl implements SettlementService {
 
 
     /**
-     * 1. DailySettlementList 생성
+     * 1. DailySettlement 생성
      * 2. DailyProductSettlement 생성
-     * 3. DailySettlement 생성
      */
 
-    // 1. DailySettlementList 생성
-    public void createDailySettlementList(
-            HashMap<String, String> paymentData,
-            DailySettlement dailySettlement,
-            DailyProductSettlement dailyProductSettlement) {
-        // 들어있는 data :
-        //      productAmount, productCode, productMainImageUrl, vendorEmail,
-        //      count, paymentMethod, paidAt, productName, key
-        DailySettlementList list = DailySettlementList.builder()
-                .vendorEmail(paymentData.get("vendorEmail"))
-                .dailySettlement(dailySettlement)
-                .dailyProductSettlement(dailyProductSettlement)
+    // 1. DailySettlement 생성
+    public DailySettlement createDailySettlement(String vendorEmail, DailyProductSettlement dailyProductSettlement) {
+        DailySettlement dailySettlement = DailySettlement.builder()
+                .vendorEmail(vendorEmail)
+                // 상태는 지급 전으로 한다
+                .dailySettlementAmount(0)
+                .dailyCommissionAmount(0)
+                .expectedDailySettlementAmount(0)
+                .settlementStatus(SettlementStatus.PAYMENT_BEFORE)
                 .build();
-        dailySettlementListRepository.save(list);
-    }
 
+        // 중복검사 -> 중복되지 않았다면 product Settlement를 daily Settlement에 추가
+        if (dailySettlement.getDailyProductSettlementList().contains(dailyProductSettlement) == false) {
+            dailySettlement.addDailyProductSettlement(dailyProductSettlement);
+        }
+        return dailySettlement;
+    }
 
     // 2. DailyProductSettlement 생성
     public DailyProductSettlement createDailyProductSettlement(
@@ -125,21 +125,6 @@ public class SettlementServiceImpl implements SettlementService {
         return todayProductSettlement;
     }
 
-
-    // 3. DailySettlement 생성
-    public void createDailySettlement(Integer totalAmount, Integer totalCommission, Integer expectedAmount) {
-        DailySettlement dailySettlement = DailySettlement.builder()
-                // 1일 정산 총 금액
-                .dailySettlementAmount(totalAmount)
-                // 1일 정산 총 수수료
-                .dailyCommissionAmount(totalCommission)
-                // 1일 정산 입금 예정액
-                .expectedDailySettlementAmount(expectedAmount)
-                // 상태는 입금 전으로 한다
-                .settlementStatus(SettlementStatus.PAYMENT_BEFORE)
-                .build();
-        dailySettlementRepository.save(dailySettlement);
-    }
 
 
 
