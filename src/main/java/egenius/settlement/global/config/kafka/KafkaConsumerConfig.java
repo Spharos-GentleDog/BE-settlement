@@ -47,6 +47,7 @@ public class KafkaConsumerConfig {
     public Properties dailyPaymentSaveProps() {
         Properties props = new Properties();
         props.put(BOOTSTRAP_SERVERS_CONFIG, bootstrapAddress);
+        props.put(GROUP_ID_CONFIG, "payment_group");
         props.put(KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         props.put(VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
 //        props.put(MAX_POLL_RECORDS_CONFIG, 3);
