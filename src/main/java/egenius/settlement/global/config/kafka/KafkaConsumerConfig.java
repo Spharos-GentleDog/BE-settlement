@@ -47,7 +47,7 @@ public class KafkaConsumerConfig {
         props.put(GROUP_ID_CONFIG, "test1");
         props.put(KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         props.put(VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
-//        props.put(MAX_POLL_RECORDS_CONFIG, 10);
+//        props.put(MAX_POLL_RECORDS_CONFIG, 3);
         return props;
     }
 }
