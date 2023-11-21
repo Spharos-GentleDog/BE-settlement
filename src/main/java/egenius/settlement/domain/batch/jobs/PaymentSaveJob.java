@@ -85,6 +85,7 @@ public class PaymentSaveJob {
     public KafkaItemReader<String, String> kafkaItemReader() {
         // kafka consumer -> kafkaItemReader는 컨슈머 하나만 설정 가능
         KafkaItemReader<String, String> dailyPaymentSaveItemReader = new KafkaItemReaderBuilder<String, String>()
+                .partitions(0)
                 .partitionOffsets(new HashMap<>()) //모름
                 .consumerProperties(dailyPaymentSaveProps)
                 .name("dailyPaymentSaveItemReader")
