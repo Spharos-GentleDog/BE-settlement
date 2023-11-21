@@ -1,6 +1,7 @@
 package egenius.settlement.domain.paysettlement.entity;
 
 import egenius.settlement.domain.paysettlement.entity.enums.SettlementStatus;
+import egenius.settlement.global.common.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -13,7 +14,8 @@ import java.util.List;
 @AllArgsConstructor
 @Getter
 @Table(name = "daily_settlement")
-public class DailySettlement {
+@ToString
+public class DailySettlement extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -36,7 +38,7 @@ public class DailySettlement {
     private SettlementStatus settlementStatus;
 
     @Builder.Default
-    @OneToMany(fetch = FetchType.LAZY)
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<DailyProductSettlement> dailyProductSettlementList = new ArrayList<>();
 
 
@@ -56,9 +58,9 @@ public class DailySettlement {
         this.dailySettlementAmount += amount;
     }
 
-    // 3. 정산 수수료 및 입금 예정액 계산
+    // 3. 정산 수수료 및 입금 예정액 계산 -> 수수료 10%로 계산
     public void updateCommissionAndExpectedAmount(Integer commission) {
-        this.dailyCommissionAmount = commission;
+        this.dailyCommissionAmount += commission;
         this.expectedDailySettlementAmount = this.dailySettlementAmount - this.dailyCommissionAmount;
     }
 

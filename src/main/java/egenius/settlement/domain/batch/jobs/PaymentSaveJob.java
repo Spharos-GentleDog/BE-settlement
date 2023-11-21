@@ -1,15 +1,11 @@
 package egenius.settlement.domain.batch.jobs;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.querydsl.jpa.impl.JPAQueryFactory;
 import egenius.settlement.domain.paysettlement.application.SettlementServiceImpl;
 import egenius.settlement.domain.paysettlement.entity.*;
 import egenius.settlement.domain.paysettlement.entity.enums.PaymentMethod;
 import egenius.settlement.domain.paysettlement.infrastructure.DailyProductSettlementRepository;
-import egenius.settlement.domain.paysettlement.infrastructure.DailySettlementListRepository;
 import egenius.settlement.domain.paysettlement.infrastructure.DailySettlementRepository;
-import egenius.settlement.global.common.exception.BaseException;
-import egenius.settlement.global.common.response.BaseResponseStatus;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.Job;
@@ -35,7 +31,7 @@ import java.util.*;
 @Slf4j
 @Configuration
 @RequiredArgsConstructor
-public class DailySettlementJob {
+public class PaymentSaveJob {
 
     // spring batch
     private final static int CHUNK_SIZE = 1;
@@ -174,13 +170,10 @@ public class DailySettlementJob {
                  */
                 String vendorEmail = (String) productData.get(6);
                 // 중복검사
-                if (dailySettlementRepository.existsByVendorEmail(vendorEmail) == false) {
-                    DailySettlement dailySettlement = settlementService.createDailySettlement(
+                DailySettlement dailySettlement = settlementService.createDailySettlement(
                             (String) productData.get(6),
                             dailyProductSettlement);
-                    dailySettlementRepository.save(dailySettlement);
-                }
-
+                dailySettlementRepository.save(dailySettlement);
             });
         };
     }
