@@ -171,7 +171,7 @@ public class PaymentSaveJob {
                 String vendorEmail = (String) productData.get(6);
                 // 중복검사
                 DailySettlement dailySettlement = settlementService.createDailySettlement(
-                            (String) productData.get(6),
+                            vendorEmail,
                             dailyProductSettlement);
                 dailySettlementRepository.save(dailySettlement);
             });
