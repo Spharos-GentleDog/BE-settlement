@@ -168,6 +168,19 @@ public class DailySettlementJob {
                         (String) productData.get(4),
                         (PaymentMethod) productData.get(5));
                 dailyProductSettlementRepository.save(dailyProductSettlement);
+
+                /**
+                 * DailySettlement 생성
+                 */
+                String vendorEmail = (String) productData.get(6);
+                // 중복검사
+                if (dailySettlementRepository.existsByVendorEmail(vendorEmail) == false) {
+                    DailySettlement dailySettlement = settlementService.createDailySettlement(
+                            (String) productData.get(6),
+                            dailyProductSettlement);
+                    dailySettlementRepository.save(dailySettlement);
+                }
+
             });
         };
     }
