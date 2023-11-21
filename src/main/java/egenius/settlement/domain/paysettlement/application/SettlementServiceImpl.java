@@ -25,6 +25,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -51,14 +52,21 @@ public class SettlementServiceImpl implements SettlementService {
 
     // 1. DailySettlement 생성
     public DailySettlement createDailySettlement(String vendorEmail, DailyProductSettlement dailyProductSettlement) {
-        DailySettlement dailySettlement = DailySettlement.builder()
-                .vendorEmail(vendorEmail)
-                // 상태는 지급 전으로 한다
-                .dailySettlementAmount(0)
-                .dailyCommissionAmount(0)
-                .expectedDailySettlementAmount(0)
-                .settlementStatus(SettlementStatus.PAYMENT_BEFORE)
-                .build();
+        Optional<DailySettlement> findResult = dailySettlementRepository.findByVendorEmail(vendorEmail);
+        DailySettlement dailySettlement = null;
+        // 중복확인
+        if (findResult.isEmpty()) {
+            dailySettlement = DailySettlement.builder()
+                    .vendorEmail(vendorEmail)
+                    // 상태는 지급 전으로 한다
+                    .dailySettlementAmount(0)
+                    .dailyCommissionAmount(0)
+                    .expectedDailySettlementAmount(0)
+                    .settlementStatus(SettlementStatus.PAYMENT_BEFORE)
+                    .build();
+        }else{
+            dailySettlement = findResult.get();
+        }
 
         // 중복검사 -> 중복되지 않았다면 product Settlement를 daily Settlement에 추가
         if (dailySettlement.getDailyProductSettlementList().contains(dailyProductSettlement) == false) {

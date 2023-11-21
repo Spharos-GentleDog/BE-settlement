@@ -22,6 +22,7 @@ import java.util.Date;
 public class DailySettlementJobLauncher {
     private final JobLauncher jobLauncher;
     private final Job dailyPaymentSaveJob;
+    private final Job dailySettlementJob;
 
 
 
@@ -35,6 +36,8 @@ public class DailySettlementJobLauncher {
                 .addDate("Date", today)
                 .addLong("time",System.currentTimeMillis())
                 .toJobParameters();
+
+        // Kafka 데이터를 받아와서, 엔티티를 생성하는 Job
         try {
             JobExecution jobExecution = jobLauncher.run(dailyPaymentSaveJob,jobParameters);
             if (jobExecution.getExitStatus().equals(ExitStatus.COMPLETED)) {
@@ -44,7 +47,16 @@ public class DailySettlementJobLauncher {
                 log.info("fail code: " + jobExecution.getExitStatus());
             }
         } catch (Exception e) {
-            log.error(e.getMessage());
+            log.error("paymentSaveJob Failed: "+e.getMessage());
+            throw new BaseException(BaseResponseStatus.PAYMENT_DATA_SAVE_FAILED);
+        }
+
+        // 저장된 결제 데이터로 일일 정산을 하는 Job
+        try {
+            JobExecution jobExecution = jobLauncher.run(dailySettlementJob, jobParameters);
+
+        } catch (Exception e) {
+            log.error("dailySettlementJob Failed: "+e.getMessage());
             throw new BaseException(BaseResponseStatus.DAILY_SETTLEMENT_FAILED);
         }
         return new BaseResponse();
