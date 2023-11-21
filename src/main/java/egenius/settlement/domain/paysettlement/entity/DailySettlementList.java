@@ -1,8 +1,10 @@
-package egenius.settlement.domain.settlement.entity;
+package egenius.settlement.domain.paysettlement.entity;
 
 import egenius.settlement.global.common.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.time.LocalDateTime;
 
 @Entity
 @Builder
@@ -19,7 +21,14 @@ public class DailySettlementList extends BaseTimeEntity {
     @Column(name = "vendor_email")
     private String vendorEmail;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @Column(name = "product_code")
+    private String productCode;
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "daily_settlement_id", referencedColumnName = "id")
     private DailySettlement dailySettlement;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "daily_product_settlement_id", referencedColumnName = "id")
+    private DailyProductSettlement dailyProductSettlement;
 }

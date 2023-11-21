@@ -1,7 +1,6 @@
-package egenius.settlement.domain.settlement.entity;
+package egenius.settlement.domain.paysettlement.entity;
 
-import egenius.settlement.domain.settlement.entity.enums.SettlementStatus;
-import egenius.settlement.global.common.BaseTimeEntity;
+import egenius.settlement.domain.paysettlement.entity.enums.SettlementStatus;
 import jakarta.persistence.*;
 import lombok.*;
 

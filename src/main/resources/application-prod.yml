@@ -5,6 +5,14 @@ spring:
   config:
     activate:
       on-profile: prod
+
+  # 스프링배치 설정
+  batch:
+    jdbc:
+      initialize-schema: always
+    job:
+      enabled: false
+
   # 카프카 접속정보 설정
   kafka:
     bootstrap-servers: ${BOOTSTRAP_SERVERS}

@@ -1,14 +1,14 @@
-package egenius.settlement.domain.settlement.entity.enums;
+package egenius.settlement.domain.paysettlement.entity.enums;
 
 import egenius.settlement.global.common.enums.BaseEnum;
 import egenius.settlement.global.common.enums.BaseEnumConverter;
 import jakarta.persistence.Converter;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 @Getter
-@AllArgsConstructor
-public enum PaymentMethod implements BaseEnum<String, String> {
+@RequiredArgsConstructor
+public enum SettlementStatus implements BaseEnum<Integer, String> {
     /**
      * 1. 코드 작성
      * 2. field 선언
@@ -16,22 +16,20 @@ public enum PaymentMethod implements BaseEnum<String, String> {
      */
 
     // 1. 코드 작성
-    CARD("C","카드"),
-    KAKAO_PAY("K","카카오페이"),
-    NAVER_PAY("N","네이버페이"),
-    TOSS_PAY("T","토스페이")
+    PAYMENT_BEFORE(0,"지급 전"),
+    PAYMENT_COMPLETED(1, "지급 완료"),
+    PAYMENT_PENDING(2, "지급 보류")
     ;
 
     // 2. field 선언
-    private final String code;
+    private final Integer code;
     private final String description;
 
     // 3. converter 구현
     @Converter(autoApply = true)
-    static class thisConverter extends BaseEnumConverter<PaymentMethod, String, String> {
+    static class thisConverter extends BaseEnumConverter<SettlementStatus, Integer, String> {
         public thisConverter() {
-            super(PaymentMethod.class);
+            super(SettlementStatus.class);
         }
     }
-
 }
