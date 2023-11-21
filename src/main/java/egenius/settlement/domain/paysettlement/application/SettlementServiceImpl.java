@@ -76,9 +76,10 @@ public class SettlementServiceImpl implements SettlementService {
             String productMainImageUrl,
             PaymentMethod paymentMethod
     ) {
-        // 정산 내용 조회
+        // 정산 내용 조회 -> 결제날짜가 아닌 생성날짜이므로, 오늘~내일 사이에 생성되어야한다
         LocalDateTime stt = LocalDate.now().atStartOfDay();
         LocalDateTime end = LocalDate.now().plusDays(1).atStartOfDay();
+        log.info("stt: "+stt+", end: "+end);
         QDailyProductSettlement qDailyProductSettlement = QDailyProductSettlement.dailyProductSettlement;
 
         // 날짜와 ProductCode로 productSettlement를 조회한다
@@ -90,6 +91,7 @@ public class SettlementServiceImpl implements SettlementService {
                             .and(qDailyProductSettlement.createdAt.lt(end))
                             .and(qDailyProductSettlement.productCode.eq(productCode)))
                     .fetchOne();
+            log.info("product result: "+productSettlement);
             // null이 아니라면 update
             if (productSettlement != null) {
                 productSettlement.addCount(count);

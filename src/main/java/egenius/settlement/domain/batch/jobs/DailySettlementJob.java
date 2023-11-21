@@ -76,7 +76,7 @@ public class DailySettlementJob {
     @Bean
     public Step dailyPaymentSaveStep(JobRepository jobRepository) {
         return new StepBuilder("dailyPaymentSaveStep", jobRepository)
-                .<String, DailyProductSettlement>chunk(CHUNK_SIZE, transactionManager)
+                .<String, List>chunk(CHUNK_SIZE, transactionManager)
                 .reader(kafkaItemReader())
                 .processor(processor())
                 .writer(writer())
@@ -105,10 +105,10 @@ public class DailySettlementJob {
     // 4. processor
     // -> 판매자별 총 정산금액과, 상품별 정산내용을 구해서 넘겨야함
     @Bean
-    public ItemProcessor<String, DailyProductSettlement> processor() {
+    public ItemProcessor<String, List> processor() {
         // 정산 내용 조회
-        LocalDateTime stt = LocalDate.now().atStartOfDay();
-        LocalDateTime end = LocalDate.now().plusDays(1).atStartOfDay();
+        LocalDateTime stt = LocalDate.now().minusDays(1).atStartOfDay();
+        LocalDateTime end = LocalDate.now().atStartOfDay();
 
         // processor 실행
         return message -> {
@@ -131,34 +131,43 @@ public class DailySettlementJob {
             LocalDateTime paidAt = LocalDateTime.parse(kafkaData.get("paidAt"), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS"));
 
             // 정산 날짜가 잘못되었다면 null을 반환
-            if (paidAt.isBefore(stt) && paidAt.isAfter(end)) {
+            if (paidAt.isBefore(stt) || paidAt.isAfter(end)) {
                 return null;
             }
 
-            /**
-             * DailyProductSettlement 생성
-             */
-            DailyProductSettlement productSettlement = settlementService.createDailyProductSettlement(
+            // 상품별 정보를 List로 return
+            List productData = Arrays.asList(
                     productName,
                     productCode,
                     productAmount,
                     count,
                     productMainImageUrl,
-                    paymentMethod);
-            return productSettlement;
+                    paymentMethod,
+                    vendorEmail);
+            return productData;
         };
     }
 
 
     // 5. writer
-    // -> DailyProductSettlement를 저장
+    // -> DailyProductSettlement를 업데이트 & 저장
     // -> DailyProductSettlement의 amount로 판매자별 일일 총 정산금액을 구해서 DailySettlement를 생성
-    // -> DaiilySettlementList를 생성
     @Bean
-    public ItemWriter<DailyProductSettlement> writer() {
+    public ItemWriter<List> writer() {
         return chunk ->{
-            chunk.forEach(productSettlement->{
-                dailyProductSettlementRepository.save(productSettlement);
+            chunk.forEach(productData->{
+                // productData는 processor에서 넘긴 list이다
+                /**
+                 * DailyProductSettlement 생성/업데이트
+                 */
+                DailyProductSettlement dailyProductSettlement = settlementService.createDailyProductSettlement(
+                        (String) productData.get(0),
+                        (String) productData.get(1),
+                        (Integer) productData.get(2),
+                        (Integer) productData.get(3),
+                        (String) productData.get(4),
+                        (PaymentMethod) productData.get(5));
+                dailyProductSettlementRepository.save(dailyProductSettlement);
             });
         };
     }

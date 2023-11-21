@@ -26,10 +26,10 @@ public class DailyProductSettlement extends BaseTimeEntity {
     @Column(name = "product_daily_total_amount")
     private Integer productDailyTotalAmount; // 상품별 일일 총 정산금액
 
-    @Column(name = "daily_card_amount", columnDefinition = "default int 0")
+    @Column(name = "daily_card_amount", columnDefinition = "int default 0")
     private Integer dailyCardAmount; // 상품별 카드 결제금액
 
-    @Column(name = "daily_pay_amount", columnDefinition = "default int 0")
+    @Column(name = "daily_pay_amount", columnDefinition = "int default 0")
     private Integer dailyPayAmount; // 상품별 페이 결제금액 - 카카오, 네이버, 토스 모두 더해서 준다
 
     @Column(name = "count")
