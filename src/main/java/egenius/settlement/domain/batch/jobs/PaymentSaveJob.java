@@ -84,9 +84,7 @@ public class PaymentSaveJob {
     @Bean
     public KafkaItemReader<String, String> kafkaItemReader() {
         // kafka consumer -> kafkaItemReader는 컨슈머 하나만 설정 가능
-        List<Integer> partitions = Arrays.asList(0, 1, 2, 3, 4);
         KafkaItemReader<String, String> dailyPaymentSaveItemReader = new KafkaItemReaderBuilder<String, String>()
-                .partitions(partitions)
                 .partitionOffsets(new HashMap<>()) //모름
                 .consumerProperties(dailyPaymentSaveProps)
                 .name("dailyPaymentSaveItemReader")
