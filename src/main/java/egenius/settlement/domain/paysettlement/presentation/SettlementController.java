@@ -1,4 +1,4 @@
-package egenius.settlement.domain.paysettlement.controller;
+package egenius.settlement.domain.paysettlement.presentation;
 
 import egenius.settlement.domain.paysettlement.application.SettlementService;
 import egenius.settlement.domain.paysettlement.dtos.in.GetDailySettlementInDto;
@@ -11,7 +11,6 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
