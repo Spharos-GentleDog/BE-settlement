@@ -1,6 +1,7 @@
 package egenius.settlement.domain.paysettlement.application;
 
 
+import egenius.settlement.domain.paysettlement.dtos.in.GetDailySettlementInDto;
 import egenius.settlement.domain.paysettlement.dtos.out.GetDailySettlementOutDto;
 import egenius.settlement.domain.paysettlement.entity.DailyProductSettlement;
 import egenius.settlement.domain.paysettlement.entity.DailySettlement;
@@ -29,5 +30,5 @@ public interface SettlementService {
     );
 
     // 3. DailySettlement 조회
-    GetDailySettlementOutDto getDailySettlement(String vendorEmail);
+    GetDailySettlementOutDto getDailySettlement(GetDailySettlementInDto getDailySettlementInDto);
 }

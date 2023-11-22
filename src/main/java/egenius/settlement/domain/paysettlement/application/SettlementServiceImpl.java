@@ -2,6 +2,7 @@ package egenius.settlement.domain.paysettlement.application;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import egenius.settlement.domain.paysettlement.dtos.DailyProductSettlementDto;
+import egenius.settlement.domain.paysettlement.dtos.in.GetDailySettlementInDto;
 import egenius.settlement.domain.paysettlement.dtos.out.GetDailySettlementOutDto;
 import egenius.settlement.domain.paysettlement.entity.*;
 import egenius.settlement.domain.paysettlement.entity.enums.PaymentMethod;
@@ -45,7 +46,9 @@ public class SettlementServiceImpl implements SettlementService {
     // 1. DailySettlement 생성
     @Override
     public DailySettlement createDailySettlement(String vendorEmail, DailyProductSettlement dailyProductSettlement) {
-        Optional<DailySettlement> findResult = dailySettlementRepository.findByVendorEmail(vendorEmail);
+        LocalDateTime today = LocalDate.now().atStartOfDay();
+        LocalDateTime tomorrow = LocalDate.now().plusDays(1).atStartOfDay();
+        Optional<DailySettlement> findResult = dailySettlementRepository.findByVendorEmailAndCreatedAtBetween(vendorEmail, today, tomorrow);
         DailySettlement dailySettlement = null;
         // 중복확인
         if (findResult.isEmpty()) {
@@ -131,9 +134,12 @@ public class SettlementServiceImpl implements SettlementService {
 
     // 3. DailySettlement 조회
     @Override
-    public GetDailySettlementOutDto getDailySettlement(String vendorEmail) {
-        // 판매자 아이디로 조회
-        DailySettlement dailySettlement = dailySettlementRepository.findByVendorEmail(vendorEmail)
+    public GetDailySettlementOutDto getDailySettlement(GetDailySettlementInDto getDailySettlementInDto) {
+        String vendorEmail = getDailySettlementInDto.getVendorEmail();
+        LocalDateTime stt = getDailySettlementInDto.getStart().atStartOfDay();
+        LocalDateTime end = getDailySettlementInDto.getEnd().atStartOfDay();
+        // 판매자 아이디 + 해당하는 날짜로 조회한다
+        DailySettlement dailySettlement = dailySettlementRepository.findByVendorEmailAndCreatedAtBetween(vendorEmail, stt, end)
                 .orElseThrow(() -> new BaseException(BaseResponseStatus.NO_DATA));
 
         // DailyProductSettlementDto 생성
