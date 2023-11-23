@@ -31,7 +31,7 @@ import java.util.*;
 @Slf4j
 @Configuration
 @RequiredArgsConstructor
-public class DailyPaymentSaveJob {
+public class DailyCreateSettleDataJob {
 
     // spring batch
     private final static int CHUNK_SIZE = 1;
