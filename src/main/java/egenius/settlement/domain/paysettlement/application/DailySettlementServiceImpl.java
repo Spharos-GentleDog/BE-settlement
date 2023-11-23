@@ -145,6 +145,10 @@ public class DailySettlementServiceImpl implements DailySettlementService {
         if (searchResult.isPresent() == true) {
             dailySettlement = searchResult.get();
         }
+        // 조건에 해당하는 일일정산이 없다면 빈값을 return
+        else if (searchResult.isEmpty() == true){
+            return GetDailySettlementOutDto.builder().build();
+        }
 
         // DailyProductSettlementDto 생성
         List<DailyProductSettlementDto> productList = new ArrayList<>();
