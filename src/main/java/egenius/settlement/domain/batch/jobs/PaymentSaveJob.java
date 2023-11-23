@@ -127,6 +127,7 @@ public class PaymentSaveJob {
 
             // 정산 날짜가 잘못되었다면 null을 반환
             if (paidAt.isBefore(stt) || paidAt.isAfter(end)) {
+                log.info("wrong data: {}, stt:{}, end:{}",paidAt,stt,end);
                 return null;
             }
 
@@ -163,6 +164,7 @@ public class PaymentSaveJob {
                         (String) productData.get(4),
                         (PaymentMethod) productData.get(5));
                 dailyProductSettlementRepository.save(dailyProductSettlement);
+                log.info("success:{}",dailyProductSettlement);
 
                 /**
                  * DailySettlement 생성
@@ -173,6 +175,7 @@ public class PaymentSaveJob {
                             vendorEmail,
                             dailyProductSettlement);
                 dailySettlementRepository.save(dailySettlement);
+                log.info("success2 :{}", dailySettlement);
             });
         };
     }

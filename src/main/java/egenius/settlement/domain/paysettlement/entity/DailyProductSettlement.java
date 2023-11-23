@@ -9,6 +9,7 @@ import lombok.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Getter
+@ToString
 @Table(name = "daily_product_settlement")
 // 상품별 1일 정산금액
 public class DailyProductSettlement extends BaseTimeEntity {
