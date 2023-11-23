@@ -1,6 +1,6 @@
 package egenius.settlement.domain.paysettlement.presentation;
 
-import egenius.settlement.domain.paysettlement.application.SettlementService;
+import egenius.settlement.domain.paysettlement.application.DailySettlementService;
 import egenius.settlement.domain.paysettlement.dtos.in.GetDailySettlementInDto;
 import egenius.settlement.domain.paysettlement.dtos.out.GetDailySettlementOutDto;
 import egenius.settlement.domain.paysettlement.webdto.in.GetDailySettlementWebInDto;
@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class SettlementController {
 
-    private final SettlementService settlementService;
+    private final DailySettlementService dailySettlementService;
     private final ModelMapper modelMapper;
 
     /**
@@ -30,7 +30,7 @@ public class SettlementController {
     @GetMapping("/daily")
     public BaseResponse<?> getDailySettlement(GetDailySettlementWebInDto webInDto) {
         GetDailySettlementInDto inDto = modelMapper.map(webInDto, GetDailySettlementInDto.class);
-        GetDailySettlementOutDto outDto = settlementService.getDailySettlement(inDto);
+        GetDailySettlementOutDto outDto = dailySettlementService.getDailySettlement(inDto);
         GetDailySettlementWebOutDto webOutDto = modelMapper.map(outDto, GetDailySettlementWebOutDto.class);
         return new BaseResponse<>(webOutDto);
     }

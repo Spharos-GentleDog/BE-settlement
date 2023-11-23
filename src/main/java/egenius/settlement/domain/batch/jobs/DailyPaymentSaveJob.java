@@ -2,13 +2,10 @@ package egenius.settlement.domain.batch.jobs;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import egenius.settlement.domain.paysettlement.application.DailySettlementServiceImpl;
-import egenius.settlement.domain.paysettlement.application.MonthlySettlementService;
 import egenius.settlement.domain.paysettlement.entity.*;
 import egenius.settlement.domain.paysettlement.entity.enums.PaymentMethod;
 import egenius.settlement.domain.paysettlement.infrastructure.DailyProductSettlementRepository;
 import egenius.settlement.domain.paysettlement.infrastructure.DailySettlementRepository;
-import egenius.settlement.domain.paysettlement.infrastructure.MonthlyProductSettlementRepository;
-import egenius.settlement.domain.paysettlement.infrastructure.MonthlySettlementRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.Job;
@@ -31,12 +28,10 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
-import static egenius.settlement.domain.paysettlement.entity.QMonthlySettlement.monthlySettlement;
-
 @Slf4j
 @Configuration
 @RequiredArgsConstructor
-public class PaymentSaveJob {
+public class DailyPaymentSaveJob {
 
     // spring batch
     private final static int CHUNK_SIZE = 1;
@@ -47,11 +42,8 @@ public class PaymentSaveJob {
     // repository
     private final DailySettlementRepository dailySettlementRepository;
     private final DailyProductSettlementRepository dailyProductSettlementRepository;
-    private final MonthlySettlementRepository monthlySettlementRepository;
-    private final MonthlyProductSettlementRepository monthlyProductSettlementRepository;
     // service
     private final DailySettlementServiceImpl dailySettlementService;
-    private final MonthlySettlementService monthlySettlementService;
     // util
     private final ObjectMapper objectMapper;
     // yml파일에 설정한 bootstrap 주소
@@ -165,42 +157,26 @@ public class PaymentSaveJob {
                 // 5: paymentMethod, 6: vendorEmail
                 /**
                  * 1. DailyProductSettlement 생성
-                 * 2. MonthlyProductSettlement 생성
                  * 3. DailySettlement 생성
-                 * 4. MonthlySettlement 생성
                  */
 
-                String productName = (String) productData.get(0);
-                String productCode = (String) productData.get(1);
                 // 1. DailyProductSettlement 생성
                 DailyProductSettlement dailyProductSettlement = dailySettlementService.createDailyProductSettlement(
-                        productName,
-                        productCode,
+                        (String) productData.get(0),
+                        (String) productData.get(1),
                         (Integer) productData.get(2),
                         (Integer) productData.get(3),
                         (String) productData.get(4),
                         (PaymentMethod) productData.get(5));
                 dailyProductSettlementRepository.save(dailyProductSettlement);
-                log.info("일일 상품정산 :{}",dailyProductSettlement);
+                log.info("success:{}",dailyProductSettlement);
 
-                // 2. MonthlyProductSettlement 생성
-                MonthlyProductSettlement monthlyProductSettlement = monthlySettlementService.createMonthlyProductSettlement(
-                        productName, productCode);
-                monthlyProductSettlementRepository.save(monthlyProductSettlement);
-                log.info("월간 상품정산 :{}",monthlyProductSettlement);
-
-
-                String vendorEmail = (String) productData.get(6);
-                // 3. DailySettlement 생성
+                // 2. DailySettlement 생성
                 DailySettlement dailySettlement = dailySettlementService.createDailySettlement(
-                            vendorEmail,
+                        (String) productData.get(6),
                             dailyProductSettlement);
                 dailySettlementRepository.save(dailySettlement);
-                log.info("일일 판매자정산 :{}",dailySettlement);
-
-                // 4. MonthlySettlement 생성
-
-                log.info("월간 판매자정산 :{}",monthlySettlement);
+                log.info("success2 :{}", dailySettlement);
             });
         };
     }

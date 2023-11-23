@@ -7,12 +7,16 @@ import egenius.settlement.domain.paysettlement.entity.DailyProductSettlement;
 import egenius.settlement.domain.paysettlement.entity.DailySettlement;
 import egenius.settlement.domain.paysettlement.entity.enums.PaymentMethod;
 
-public interface SettlementService {
+import java.util.List;
+
+public interface DailySettlementService {
 
     /**
      * 1. DailySettlement 생성
      * 2. DailyProductSettlement 생성
      * 3. DailySettlement 조회
+     * 4. 월간 판매자 정산을 진행할 판매자 조회
+     * 5. 월간 상품 정산을 진행할 상품 조회
      */
 
 
@@ -31,4 +35,10 @@ public interface SettlementService {
 
     // 3. DailySettlement 조회
     GetDailySettlementOutDto getDailySettlement(GetDailySettlementInDto getDailySettlementInDto);
+
+    // 4. 월간 판매자 정산을 진행할 판매자 조회
+    List<String> getMonthlyVendor();
+
+    // 5. 월간 상품 정산을 진행할 상품 조회
+    List<String> getMonthlyProduct();
 }

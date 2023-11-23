@@ -1,7 +1,7 @@
 package egenius.settlement.domain.batch.jobs;
 
 import egenius.settlement.domain.batch.chunk.QuerydslPagingItemReader;
-import egenius.settlement.domain.paysettlement.application.SettlementServiceImpl;
+import egenius.settlement.domain.paysettlement.application.DailySettlementServiceImpl;
 import egenius.settlement.domain.paysettlement.entity.DailySettlement;
 import egenius.settlement.domain.paysettlement.entity.QDailySettlement;
 import egenius.settlement.domain.paysettlement.infrastructure.DailyProductSettlementRepository;
@@ -37,7 +37,7 @@ public class DailySettleJob {
     private final DailySettlementRepository dailySettlementRepository;
     private final DailyProductSettlementRepository dailyProductSettlementRepository;
     // service
-    private final SettlementServiceImpl settlementService;
+    private final DailySettlementServiceImpl settlementService;
     // util
     // yml
 
