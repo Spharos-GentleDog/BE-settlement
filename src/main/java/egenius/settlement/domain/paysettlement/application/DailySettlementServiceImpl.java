@@ -2,7 +2,6 @@ package egenius.settlement.domain.paysettlement.application;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import egenius.settlement.domain.paysettlement.dtos.DailyProductSettlementDto;
-import egenius.settlement.domain.paysettlement.dtos.in.GetDailySettlementInDto;
 import egenius.settlement.domain.paysettlement.dtos.out.GetDailySettlementOutDto;
 import egenius.settlement.domain.paysettlement.entity.*;
 import egenius.settlement.domain.paysettlement.entity.enums.PaymentMethod;
@@ -135,10 +134,9 @@ public class DailySettlementServiceImpl implements DailySettlementService {
 
     // 3. DailySettlement 조회
     @Override
-    public GetDailySettlementOutDto getDailySettlement(GetDailySettlementInDto getDailySettlementInDto) {
-        String vendorEmail = getDailySettlementInDto.getVendorEmail();
-        LocalDateTime stt = getDailySettlementInDto.getStart().atStartOfDay();
-        LocalDateTime end = getDailySettlementInDto.getEnd().atStartOfDay();
+    public GetDailySettlementOutDto getDailySettlement(String vendorEmail) {
+        LocalDateTime stt = LocalDate.now().atStartOfDay();
+        LocalDateTime end = LocalDate.now().plusDays(1).atStartOfDay();
         // 판매자 아이디 + 해당하는 날짜로 조회한다
         DailySettlement dailySettlement = null;
         Optional<DailySettlement> searchResult = dailySettlementRepository.findByVendorEmailAndCreatedAtBetween(vendorEmail, stt, end);
