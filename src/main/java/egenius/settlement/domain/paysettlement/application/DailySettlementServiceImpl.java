@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -27,7 +28,7 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 @Transactional
-public class SettlementServiceImpl implements SettlementService {
+public class DailySettlementServiceImpl implements DailySettlementService {
 
     // repository
     private final DailyProductSettlementRepository dailyProductSettlementRepository;
@@ -139,8 +140,11 @@ public class SettlementServiceImpl implements SettlementService {
         LocalDateTime stt = getDailySettlementInDto.getStart().atStartOfDay();
         LocalDateTime end = getDailySettlementInDto.getEnd().atStartOfDay();
         // 판매자 아이디 + 해당하는 날짜로 조회한다
-        DailySettlement dailySettlement = dailySettlementRepository.findByVendorEmailAndCreatedAtBetween(vendorEmail, stt, end)
-                .orElseThrow(() -> new BaseException(BaseResponseStatus.NO_DATA));
+        DailySettlement dailySettlement = null;
+        Optional<DailySettlement> searchResult = dailySettlementRepository.findByVendorEmailAndCreatedAtBetween(vendorEmail, stt, end);
+        if (searchResult.isPresent() == true) {
+            dailySettlement = searchResult.get();
+        }
 
         // DailyProductSettlementDto 생성
         List<DailyProductSettlementDto> productList = new ArrayList<>();
@@ -152,8 +156,42 @@ public class SettlementServiceImpl implements SettlementService {
         // return Dto 생성
         GetDailySettlementOutDto outDto = modelMapper.map(dailySettlement, GetDailySettlementOutDto.class);
         outDto.createProductList(productList);
-
         return outDto;
     }
 
+
+    // 4. 월간 판매자 정산을 진행할 판매자 조회
+    @Override
+    public List<String> getMonthlyVendor() {
+        QDailySettlement qDailySettlement = QDailySettlement.dailySettlement;
+        LocalDateTime stt = YearMonth.now().minusMonths(1).atDay(1).atStartOfDay();
+        LocalDateTime end = YearMonth.now().atDay(2).atStartOfDay();
+        // (현재 달 -1)에 해당하는 판매자들을 조회
+        List<String> vendorList = jpaQueryFactory
+                .select(qDailySettlement.vendorEmail)
+                .from(qDailySettlement)
+                .where(qDailySettlement.createdAt.goe(stt)
+                        .and(qDailySettlement.createdAt.lt(end)))
+                .distinct()
+                .fetch();
+        return vendorList;
+    }
+
+    // 5. 월간 상품 정산을 진행할 상품 조회
+    @Override
+    public List<String> getMonthlyProduct() {
+        QDailyProductSettlement qProductSettlement = QDailyProductSettlement.dailyProductSettlement;
+        LocalDateTime stt = YearMonth.now().minusMonths(1).atDay(1).atStartOfDay();
+        LocalDateTime end = YearMonth.now().atDay(2).atStartOfDay();
+        // (현재 달 -1)에 해당하는 상품들을 조회
+        List<String> productList = jpaQueryFactory
+                .select(qProductSettlement.productCode)
+                .from(qProductSettlement)
+                .where(qProductSettlement.createdAt.goe(stt)
+                        .and(qProductSettlement.createdAt.lt(end)))
+                .distinct()
+                .fetch();
+
+        return null;
+    }
 }
