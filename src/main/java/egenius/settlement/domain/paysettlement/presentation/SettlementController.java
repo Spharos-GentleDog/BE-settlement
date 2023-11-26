@@ -15,6 +15,8 @@ import org.modelmapper.ModelMapper;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.YearMonth;
 
 @RestController
@@ -35,9 +37,8 @@ public class SettlementController {
     @Operation(summary = "일일 정산 조회", description = "판매자별 일일 정산 조회", tags = {"Daily Settlement"})
     @GetMapping("/daily")
     public BaseResponse<?> getDailySettlement(@RequestHeader String vendorEmail,
-                                              GetDailySettlementWebInDto webInDto) {
-        GetDailySettlementInDto inDto = modelMapper.map(webInDto, GetDailySettlementInDto.class);
-        GetDailySettlementOutDto outDto = dailySettlementService.getDailySettlement(vendorEmail, inDto);
+                                              @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date) {
+        GetDailySettlementOutDto outDto = dailySettlementService.getDailySettlement(vendorEmail, date);
         GetDailySettlementWebOutDto webOutDto = modelMapper.map(outDto, GetDailySettlementWebOutDto.class);
         return new BaseResponse<>(webOutDto);
     }

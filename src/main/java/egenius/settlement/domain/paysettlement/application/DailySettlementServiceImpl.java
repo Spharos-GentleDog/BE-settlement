@@ -138,9 +138,9 @@ public class DailySettlementServiceImpl implements DailySettlementService {
     // 3. DailySettlement 조회
     @Override
     public GetDailySettlementOutDto getDailySettlement(String vendorEmail,
-                                                       GetDailySettlementInDto getDailySettlementInDto) {
-        LocalDateTime stt = getDailySettlementInDto.getStart().atStartOfDay();
-        LocalDateTime end = getDailySettlementInDto.getEnd().atStartOfDay();
+                                                       LocalDate date) {
+        LocalDateTime stt = date.atStartOfDay();
+        LocalDateTime end = date.plusDays(1).atStartOfDay();
         // 판매자 아이디 + 해당하는 날짜로 조회한다
         DailySettlement dailySettlement = null;
         Optional<DailySettlement> searchResult = dailySettlementRepository.findByVendorEmailAndCreatedAtBetween(vendorEmail, stt, end);
