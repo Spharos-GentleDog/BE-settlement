@@ -6,6 +6,15 @@ spring:
     activate:
       on-profile: prod
 
+  # 스케쥴러 설정
+  scheduler:
+    - create_monthly_settle_data_launcher:
+        - cron: ${CREATE_MONTHLY_LAUNCHER_CRON}
+        - zone: ${CREATE_MONTHLY_LAUNCHER_ZONE}
+    - daily_settlement_job_launcher:
+        - cron: ${DAILY_SETTLEMENT_LAUNCHER_CRON}
+        - zone: ${DAILY_SETTLEMENT_LAUNCHER_ZONE}
+
   # 스프링배치 설정
   batch:
     jdbc:

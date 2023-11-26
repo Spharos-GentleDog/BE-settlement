@@ -1,10 +1,13 @@
 package egenius.settlement.domain.paysettlement.entity;
 
 import egenius.settlement.domain.paysettlement.entity.enums.SettlementStatus;
+import egenius.settlement.global.common.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Builder
@@ -12,11 +15,14 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @Getter
 @Table(name = "monthly_settlement")
-public class MonthlySettlement {
+public class MonthlySettlement extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(name = "vendor_email")
+    private String vendorEmail;
 
     @Column(name = "monthly_settlement_amount")
     private Integer monthlySettlementAmount;
@@ -31,6 +37,10 @@ public class MonthlySettlement {
     @Column(name = "settlement_status", columnDefinition = "tinyint", length = 5)
     private SettlementStatus settlementStatus;
 
+    @Builder.Default
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<MonthlyProductSettlement> monthlyProductSettlementList = new ArrayList<>();
+
     // 언제 날짜부터 정산을 시작했는지
     @Column(name = "settlement_start_day")
     private LocalDate settlementStartDay;
@@ -38,4 +48,33 @@ public class MonthlySettlement {
     // 언제 날짜까지 정산을 했는지
     @Column(name = "settlement_end_day")
     private LocalDate settlementEndDay;
+
+
+    /**
+     * 1. MonthlyProductSettlement 추가
+     * 2. 정산 금액 추가
+     * 3. 정산 수수료 및 입금 예정액 계산
+     * 4. MonthlyProductSettlementList 업데이트
+     */
+
+    // 1. MonthlyProductSettlement 추가
+    public void addMonthlyProductSettlement(MonthlyProductSettlement monthlyProductSettlement) {
+        this.monthlyProductSettlementList.add(monthlyProductSettlement);
+    }
+
+    // 2. 정산 금액 추가
+    public void addSettlementAmount(Integer amount) {
+        this.monthlySettlementAmount += amount;
+    }
+
+    // 3. 정산 수수료 및 입금 예정액 계산 -> 수수료 10%로 계산
+    public void updateCommissionAndExpectedAmount(Integer commission) {
+        this.monthlyCommissionAmount += commission;
+        this.expectedMonthlySettlementAmount = this.monthlySettlementAmount - this.monthlyCommissionAmount;
+    }
+
+    // 4. List 업데이트
+    public void updateMonthlyProductSettlementList(List<MonthlyProductSettlement> list) {
+        this.monthlyProductSettlementList = list;
+    }
 }

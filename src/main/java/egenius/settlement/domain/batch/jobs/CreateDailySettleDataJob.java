@@ -31,7 +31,7 @@ import java.util.*;
 @Slf4j
 @Configuration
 @RequiredArgsConstructor
-public class DailyCreateSettleDataJob {
+public class CreateDailySettleDataJob {
 
     // spring batch
     private final static int CHUNK_SIZE = 1;
@@ -74,8 +74,8 @@ public class DailyCreateSettleDataJob {
         return new StepBuilder("dailyPaymentSaveStep", jobRepository)
                 .<String, List>chunk(CHUNK_SIZE, transactionManager)
                 .reader(kafkaItemReader())
-                .processor(processor())
-                .writer(writer())
+                .processor(dailyPaymentSaveProcessor())
+                .writer(dailyPaymentSaveWriter())
                 .build();
     }
 
@@ -100,7 +100,7 @@ public class DailyCreateSettleDataJob {
     // 4. processor
     // -> 판매자별 총 정산금액과, 상품별 정산내용을 구해서 넘겨야함
     @Bean
-    public ItemProcessor<String, List> processor() {
+    public ItemProcessor<String, List> dailyPaymentSaveProcessor() {
         // 정산 내용 조회
         LocalDateTime stt = LocalDate.now().minusDays(1).atStartOfDay();
         LocalDateTime end = LocalDate.now().atStartOfDay();
@@ -149,7 +149,7 @@ public class DailyCreateSettleDataJob {
     // -> DailyProductSettlement를 업데이트 & 저장
     // -> DailyProductSettlement의 amount로 판매자별 일일 총 정산금액을 구해서 DailySettlement를 생성
     @Bean
-    public ItemWriter<List> writer() {
+    public ItemWriter<List> dailyPaymentSaveWriter() {
         return chunk ->{
             chunk.forEach(productData->{
                 // productData는 processor에서 넘긴 list이다

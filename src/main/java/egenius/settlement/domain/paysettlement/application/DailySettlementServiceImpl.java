@@ -42,6 +42,8 @@ public class DailySettlementServiceImpl implements DailySettlementService {
      * 1. DailySettlement 생성
      * 2. DailyProductSettlement 생성
      * 3. DailySettlement 조회
+     * 4. 월간 판매자 정산을 진행할 판매자 조회
+     * 5. 월간 상품 정산을 진행할 상품 조회
      */
 
     // 1. DailySettlement 생성
@@ -195,7 +197,6 @@ public class DailySettlementServiceImpl implements DailySettlementService {
                         .and(qProductSettlement.createdAt.lt(end)))
                 .distinct()
                 .fetch();
-
-        return null;
+        return productList;
     }
 }

@@ -7,27 +7,22 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.*;
 import org.springframework.batch.core.launch.JobLauncher;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Date;
 
-@RestController
-@RequestMapping("/api/v1/settlement/daily/batch")
-@RequiredArgsConstructor
+@Service
 @Slf4j
-public class DailySettlementJobLauncher {
+@RequiredArgsConstructor
+public class SechedulerTest {
     private final JobLauncher jobLauncher;
-    private final Job dailyPaymentSaveJob;
     private final Job dailySettlementJob;
 
-
-
-    //todo: 스케쥴러로 작동하게 만들기
-    @GetMapping("")
+    @Scheduled(cron = "0 0 16 * * *", zone = "Asia/Seoul")
+//    @Scheduled(fixedRate = 20000)
     public BaseResponse paymentDataTransferBatch() {
         Date today = Date.from(LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant());
         // jobParams : job을 실행할때 넘겨주고싶은 파라미터 & job을 고유하게 식별하는 역할
@@ -36,10 +31,8 @@ public class DailySettlementJobLauncher {
                 .addDate("Date", today)
                 .addLong("time",System.currentTimeMillis())
                 .toJobParameters();
-
-        // Kafka 데이터를 받아와서, 엔티티를 생성하는 Job
         try {
-            JobExecution jobExecution = jobLauncher.run(dailyPaymentSaveJob,jobParameters);
+            JobExecution jobExecution = jobLauncher.run(dailySettlementJob,jobParameters);
             if (jobExecution.getExitStatus().equals(ExitStatus.COMPLETED)) {
                 log.info("job success");
             } else {
@@ -47,19 +40,9 @@ public class DailySettlementJobLauncher {
                 log.info("fail code: " + jobExecution.getExitStatus());
             }
         } catch (Exception e) {
-            log.error("paymentSaveJob Failed: "+e.getMessage());
-            throw new BaseException(BaseResponseStatus.PAYMENT_DATA_SAVE_FAILED);
-        }
-
-        // 저장된 결제 데이터로 일일 정산을 하는 Job
-        try {
-            JobExecution jobExecution = jobLauncher.run(dailySettlementJob, jobParameters);
-
-        } catch (Exception e) {
-            log.error("dailySettlementJob Failed: "+e.getMessage());
+            log.error(e.getMessage());
             throw new BaseException(BaseResponseStatus.DAILY_SETTLEMENT_FAILED);
         }
         return new BaseResponse();
     }
-
 }
