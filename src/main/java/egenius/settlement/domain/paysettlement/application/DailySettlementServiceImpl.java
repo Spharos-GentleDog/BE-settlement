@@ -166,37 +166,37 @@ public class DailySettlementServiceImpl implements DailySettlementService {
     }
 
 
-    // 4. 월간 판매자 정산을 진행할 판매자 조회
+    // 4. 월간 판매자 정산을 진행할 DailySettlement 조회
     @Override
-    public List<String> getMonthlyVendor() {
+    public List<DailySettlement> getDailySettlementForMonthlySettlement(String vendorEmail) {
         QDailySettlement qDailySettlement = QDailySettlement.dailySettlement;
         LocalDateTime stt = YearMonth.now().minusMonths(1).atDay(1).atStartOfDay();
-        LocalDateTime end = YearMonth.now().atDay(2).atStartOfDay();
-        // (현재 달 -1)에 해당하는 판매자들을 조회
-        List<String> vendorList = jpaQueryFactory
-                .select(qDailySettlement.vendorEmail)
-                .from(qDailySettlement)
+        LocalDateTime end = YearMonth.now().atDay(30).atStartOfDay();
+        // 날짜와 vendorEmail이 일치하는 일일 정산을 조회
+        List<DailySettlement> dailySettlementList = jpaQueryFactory
+                .selectFrom(qDailySettlement)
                 .where(qDailySettlement.createdAt.goe(stt)
-                        .and(qDailySettlement.createdAt.lt(end)))
-                .distinct()
+                        .and(qDailySettlement.createdAt.lt(end))
+                        .and(qDailySettlement.vendorEmail.eq(vendorEmail))
+                )
                 .fetch();
-        return vendorList;
+        return dailySettlementList;
     }
 
-    // 5. 월간 상품 정산을 진행할 상품 조회
+    // 5. 월간 상품 정산을 진행할 DailyProductSettlement 조회
     @Override
-    public List<String> getMonthlyProduct() {
+    public List<DailyProductSettlement> getDailyProductForMonthlySettlement(String productCode) {
         QDailyProductSettlement qProductSettlement = QDailyProductSettlement.dailyProductSettlement;
         LocalDateTime stt = YearMonth.now().minusMonths(1).atDay(1).atStartOfDay();
-        LocalDateTime end = YearMonth.now().atDay(2).atStartOfDay();
-        // (현재 달 -1)에 해당하는 상품들을 조회
-        List<String> productList = jpaQueryFactory
-                .select(qProductSettlement.productCode)
-                .from(qProductSettlement)
+        LocalDateTime end = YearMonth.now().atDay(30).atStartOfDay();
+        // 날짜와 productCode가 일치하는 일일 상품정산을 조회
+        List<DailyProductSettlement> productSettlementList = jpaQueryFactory
+                .selectFrom(qProductSettlement)
                 .where(qProductSettlement.createdAt.goe(stt)
-                        .and(qProductSettlement.createdAt.lt(end)))
-                .distinct()
+                        .and(qProductSettlement.createdAt.lt(end))
+                        .and(qProductSettlement.productCode.eq(productCode))
+                )
                 .fetch();
-        return productList;
+        return productSettlementList;
     }
 }

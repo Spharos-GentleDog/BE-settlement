@@ -101,7 +101,14 @@ public class CreateMonthlySettleDataJob {
                 // 중복확인 후 생성 혹은 업데이트
                 String vendorEmail = dailySettlement.getVendorEmail();
                 MonthlySettlement monthlySettlement = monthlySettlementService.createMonthlySettlement(vendorEmail);
-                monthlySettlement.updateMonthlyProductSettlementList(monthlyProductSettlementList);
+                log.info("월말상품정산 리스트: {}",monthlyProductSettlementList);
+                monthlyProductSettlementList.forEach(
+                        monthlyProduct -> {
+                            if (monthlySettlement.getMonthlyProductSettlementList().contains(monthlyProduct) == false) {
+                                monthlySettlement.addMonthlyProductSettlement(monthlyProduct);
+                            }
+                        }
+                );
                 // 저장
                 monthlySettlementRepository.save(monthlySettlement);
             });

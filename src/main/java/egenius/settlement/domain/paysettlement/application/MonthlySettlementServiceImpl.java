@@ -35,6 +35,7 @@ public class MonthlySettlementServiceImpl implements MonthlySettlementService{
      * 1. MonthlySettlement 생성
      * 2. MonthlyProductSettlement 생성
      * 3. MonthlySettlement 조회
+     * 4. MonthlyProductSettlement 조회
      */
 
     // 1. MonthlySettlement 생성
@@ -94,5 +95,6 @@ public class MonthlySettlementServiceImpl implements MonthlySettlementService{
     // 3. MonthlySettlement 조회
 
 
+    // 4. MonthlyProductSettlement 조회
 
 }

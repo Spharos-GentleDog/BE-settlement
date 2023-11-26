@@ -41,9 +41,6 @@ public class DailySettleJob {
     private final DailySettlementQuerydslReader dailySettlementQuerydslReader;
     // repository
     private final DailySettlementRepository dailySettlementRepository;
-    private final DailyProductSettlementRepository dailyProductSettlementRepository;
-    // service
-    private final DailySettlementServiceImpl settlementService;
     // util
     // yml
 

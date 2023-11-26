@@ -28,6 +28,7 @@ public enum BaseResponseStatus {
     PAYMENT_DATA_SAVE_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, false, 6003, "결제 데이터 저장에 실패했습니다"),
     NO_DATA(HttpStatus.BAD_REQUEST, false, 6004, "존재하지 않는 정보입니다"),
     CREATE_MONTHLY_SETTLEMENT_DATA_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, false, 6005,"월간 정산 정보 생성에 실패했습니다"),
+    MONTHLY_SETTLEMENT_FAILED(HttpStatus.INTERNAL_SERVER_ERROR,false,6006,"월간 정산에 실패했습니다"),
 
     ;
 

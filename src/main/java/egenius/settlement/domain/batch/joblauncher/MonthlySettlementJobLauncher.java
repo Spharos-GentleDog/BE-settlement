@@ -15,13 +15,14 @@ import java.time.YearMonth;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class MonthlyPaymentSaveJobLauncher {
+public class MonthlySettlementJobLauncher {
     private final JobLauncher jobLauncher;
     private final Job monthlyPaymentSaveJob;
+    private final Job monthlySettlementJob;
 
     @Scheduled(cron = "${spring.scheduler.create_monthly_settle_data_launcher.cron}",
     zone = "${spring.scheduler.create_monthly_settle_data_launcher.zone}")
-    public void CreateMonthlyDataJobLauncher() {
+    public void MonthlySettlementJobLauncher() {
         // (현재 달 -1)에 해당하는 판매자들을 조회
 //        LocalDateTime start = YearMonth.now().minusMonths(1).atDay(1).atStartOfDay();
 //        LocalDateTime end = YearMonth.now().atDay(2).atStartOfDay();
@@ -34,7 +35,7 @@ public class MonthlyPaymentSaveJobLauncher {
                 .addLong("time", System.currentTimeMillis())
                 .toJobParameters();
 
-        // Job 실행
+        // entity 생성 Job 실행
         try {
             JobExecution jobExecution = jobLauncher.run(monthlyPaymentSaveJob, jobParameters);
             if (jobExecution.getExitStatus().equals(ExitStatus.COMPLETED)) {
@@ -46,6 +47,20 @@ public class MonthlyPaymentSaveJobLauncher {
         } catch (Exception e) {
             log.error("monthlyPaymentSaveJob Failed: "+e.getMessage());
             throw new BaseException(BaseResponseStatus.CREATE_MONTHLY_SETTLEMENT_DATA_FAILED);
+        }
+
+        // 정산 Job 실행
+        try {
+            JobExecution jobExecution = jobLauncher.run(monthlySettlementJob, jobParameters);
+            if (jobExecution.getExitStatus().equals(ExitStatus.COMPLETED)) {
+                log.info("job success");
+            } else {
+                log.info("job failed");
+                log.info("fail code: " + jobExecution.getExitStatus());
+            }
+        }catch (Exception e) {
+            log.error("monthlyPaymentSaveJob Failed: "+e.getMessage());
+            throw new BaseException(BaseResponseStatus.MONTHLY_SETTLEMENT_FAILED);
         }
     }
 }

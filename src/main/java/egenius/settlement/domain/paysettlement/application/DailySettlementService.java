@@ -15,8 +15,8 @@ public interface DailySettlementService {
      * 1. DailySettlement 생성
      * 2. DailyProductSettlement 생성
      * 3. DailySettlement 조회
-     * 4. 월간 판매자 정산을 진행할 판매자 조회
-     * 5. 월간 상품 정산을 진행할 상품 조회
+     * 4. 월간 판매자 정산을 진행할 DailySettlement 조회
+     * 5. 월간 상품 정산을 진행할 DailyProductSettlement 조회
      */
 
 
@@ -36,9 +36,9 @@ public interface DailySettlementService {
     // 3. DailySettlement 조회
     GetDailySettlementOutDto getDailySettlement(String vendorEmail, GetDailySettlementInDto getDailySettlementInDto);
 
-    // 4. 월간 판매자 정산을 진행할 판매자 조회
-    List<String> getMonthlyVendor();
+    // 4. 월간 판매자 정산을 진행할 DailySettlement 조회
+    List<DailySettlement> getDailySettlementForMonthlySettlement(String vendorEmail);
 
-    // 5. 월간 상품 정산을 진행할 상품 조회
-    List<String> getMonthlyProduct();
+    // 5. 월간 상품 정산을 진행할 DailyProductSettlement 조회
+    List<DailyProductSettlement> getDailyProductForMonthlySettlement(String productCode);
 }
