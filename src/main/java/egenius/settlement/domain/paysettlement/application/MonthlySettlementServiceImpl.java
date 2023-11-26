@@ -1,6 +1,8 @@
 package egenius.settlement.domain.paysettlement.application;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import egenius.settlement.domain.paysettlement.dtos.MonthlyProductSettlementDto;
+import egenius.settlement.domain.paysettlement.dtos.out.GetMonthlySettlementOutDto;
 import egenius.settlement.domain.paysettlement.entity.MonthlyProductSettlement;
 import egenius.settlement.domain.paysettlement.entity.MonthlySettlement;
 import egenius.settlement.domain.paysettlement.entity.enums.SettlementStatus;
@@ -59,8 +61,6 @@ public class MonthlySettlementServiceImpl implements MonthlySettlementService{
                     .monthlyCommissionAmount(0)
                     .expectedMonthlySettlementAmount(0)
                     .settlementStatus(SettlementStatus.PAYMENT_BEFORE)
-                    .settlementStartDay(YearMonth.now().minusMonths(1).atDay(1))
-                    .settlementEndDay(YearMonth.now().minusMonths(1).atEndOfMonth())
                     .build();
         }
     }
@@ -93,7 +93,30 @@ public class MonthlySettlementServiceImpl implements MonthlySettlementService{
     }
 
     // 3. MonthlySettlement 조회
-
+    @Override
+    @Transactional(readOnly = true)
+    public GetMonthlySettlementOutDto getMonthlySettlement(String vendorEmail, YearMonth yearMonth) {
+        LocalDateTime stt = YearMonth.now().atDay(2).atStartOfDay();
+        LocalDateTime end = YearMonth.now().plusMonths(1).atDay(3).atStartOfDay();
+        // 판매자 아이디 + 해당하는 날짜로 조회한다
+        Optional<MonthlySettlement> searchResult = monthlySettlementRepository.findByVendorEmailAndCreatedAtBetween(vendorEmail, stt, end);
+        // 존재하지 않으면 빈값을 return
+        if (searchResult.isEmpty() == true) {
+            return GetMonthlySettlementOutDto.builder().build();
+        }
+        // MonthlyProductSettlementDto 생성
+        List<MonthlyProductSettlementDto> productList = new ArrayList<>();
+        MonthlySettlement monthlySettlement = searchResult.get();
+        log.info("월간정산 조회: {}", monthlySettlement);
+        monthlySettlement.getMonthlyProductSettlementList().forEach(data -> {
+            MonthlyProductSettlementDto settlementDto = modelMapper.map(data, MonthlyProductSettlementDto.class);
+            productList.add(settlementDto);
+        });
+        // return Dto 생성
+        GetMonthlySettlementOutDto outDto = modelMapper.map(monthlySettlement, GetMonthlySettlementOutDto.class);
+        outDto.createProductList(productList);
+        return outDto;
+    }
 
     // 4. MonthlyProductSettlement 조회
 

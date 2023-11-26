@@ -41,13 +41,6 @@ public class MonthlySettlement extends BaseTimeEntity {
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<MonthlyProductSettlement> monthlyProductSettlementList = new ArrayList<>();
 
-    // 언제 날짜부터 정산을 시작했는지
-    @Column(name = "settlement_start_day")
-    private LocalDate settlementStartDay;
-
-    // 언제 날짜까지 정산을 했는지
-    @Column(name = "settlement_end_day")
-    private LocalDate settlementEndDay;
 
 
     /**
